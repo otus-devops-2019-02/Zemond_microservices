@@ -1,0 +1,12 @@
+REPOSITORY                  TAG                 IMAGE ID            CREATED             SIZE
+pankratov/ubuntu-tmp-file   latest              99e0826c874b        47 seconds ago      119MB
+ubuntu                      16.04               2a697363a870        2 weeks ago         119MB
+hello-world                 latest              fce289e99eb9        5 months ago        1.84kB
+
+Задание со *
+
+Главное отличие между образом и контейнером в том, что у контенера есть доступный верхний слой для записи.
+Т.е. при выполнии команд docker inspect <u_container_id> и docker inspect <u_image_id> можно увидеть, что докер
+берет образ, добавляет доступный для записи слой и там инициализирует различные параметры.
+
+Так же докер, при запуске не запускает контейнер, а берет его за шаблон и на его основе создает контейнер. 
