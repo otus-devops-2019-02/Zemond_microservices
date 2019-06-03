@@ -21,3 +21,19 @@ Zemond microservices repository
 3. Вывод команды docker images направил в файл docker-1.log
 4. В файле docker-1.log описал чем отличается контейнер от образа. 
 
+Домашняя работа №15
+
+1. Создал новый проект в GCP. Инициализировал gcloud.
+2. Установил docker-mashine.
+3. Создал структуру репозитория.
+4. Собрал образ. 
+	docker build -t reddit:latest .
+5. Запустил контейнер.
+	docker run --name reddit -d --network=host reddit:latest
+6. Настроил файрвол.
+7. Зарегестрировался на докер хабе.
+8. Запушил свой образ
+	 docker tag reddit:latest zemond/otus-reddit:1.0
+9. Сделал необходимые проверки.
+
+Задание со * не делал. 
