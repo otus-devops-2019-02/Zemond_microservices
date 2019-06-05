@@ -37,3 +37,43 @@ Zemond microservices repository
 9. Сделал необходимые проверки.
 
 Задание со * не делал. 
+
+Домашняя работа №16
+
+1. Скачал и распаковал архив по ссылке, переименовал директорию.
+2. Создал докер файлы в следующих директориях:
+	
+	post-py
+	comment
+	ui
+
+3. Скачал последний образ монги и собрал образы
+
+	docker pull mongo:latest
+	docker build -t zemond/post:1.0 ./post-py
+	docker build -t zemond/comment:1.0 ./comment
+	docker build -t zemond/ui:1.0 ./ui
+
+4. Создал сеть и запустил контейнеры
+
+	docker network create reddit
+	docker run -d --network=reddit --network-alias=post_db --network-alias=comment_db mongo:latest
+	docker run -d --network=reddit --network-alias=post zemond/post:1.0
+	docker run -d --network=reddit --network-alias=comment zemond/comment:1.0
+	docker run -d --network=reddit -p 9292:9292 zemond/ui:1.0
+
+5. Задание со * не делеал
+6. Поменял содержимое ui, для уменьшения образа
+7. Задание со * выполнил частично, добавил сборку образа из Alpine Linux тем самым уменьшим размер образа
+8. Создал докер вольюм
+
+	docker volume create reddit_db
+
+9. Выключил старые контейнеры и собрал новые
+
+	docker kill $(docker ps -q)
+	docker run -d --network=reddit --network-alias=post_db --network-alias=comment_db -v reddit_db:/data/db mongo:latest
+	docker run -d --network=reddit --network-alias=post zemond/post:1.0
+	docker run -d --network=reddit --network-alias=comment zemond/comment:1.0
+	docker run -d --network=reddit -p 9292:9292 zemond/ui:2.0
+
