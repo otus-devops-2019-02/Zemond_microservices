@@ -77,3 +77,25 @@ Zemond microservices repository
 	docker run -d --network=reddit --network-alias=comment zemond/comment:1.0
 	docker run -d --network=reddit -p 9292:9292 zemond/ui:2.0
 
+Домашняя работа №17
+
+1. Познакомился с bridge network driver
+2. Установил docker-compose
+3. Создал ямлик dockercompose.yml
+4. Запустил контейнеры
+
+	export USERNAME=zemond
+	docker-compose up -d 
+	docker-compose ps
+
+5. Изменил docker-compose под кейс с множеством сетей, сетевых алиасов.
+6. Параметризовал с помощью переменных окружений:
+
+	• порт публикации сервиса ui
+	• версии сервисов
+
+7. Параметризовал параметры и записал их в отдельный файл c расширением .env
+8. Без использования команд source и export
+
+9. Имя проекта можно задать через через параметр project_name в ямлике docker-compose.yml
+10. Задание со * не выполнил.
