@@ -107,3 +107,41 @@ Zemond microservices repository
 2. Зарегистрировал раннер
 3. Настроил файл .gitlab-ci.yml в котором указываются последовательность шагов для пайплана из описание и настройки.
 4. Закомитил в гитлаб и посмотрел как работают пайплайны
+
+Домашняя работа №19
+
+1. Создал правила фаервола для Prometheus и Puma
+
+gcloud compute firewall-rules create prometheus-default --allow tcp:9090
+gcloud compute firewall-rules create puma-default --allow tcp:9292
+
+2. Создал docker-host start_docker_machine.sh
+3. Запустил Prometheus
+
+docker run --rm -p 9090:9090 -d --name prometheus prom/prometheus:v2.1.0
+
+4. Конфигурация
+	4.1 В директории monitoring/prometheus создал файл prometheus.yml c настройками
+	4.2 В директории prometheus собрал Docker образ:
+
+		export USER_NAME=zemond
+		docker build -t $USER_NAME/prometheus .
+
+5. Собрал images при помощи скриптов docker_build.sh в директории каждого сервиса
+
+	for i in post-py ui comment; do cd src/$i; bash docker_build.sh; cd -; done
+
+6. Запустил наш Prometheus совместно с микросервисами. 
+
+	docker-compose up -d
+
+Ссылка на докер хаб
+
+https://cloud.docker.com/u/zemond/repository/list
+
+Запушенные контейнеры:
+
+zemond / prometheus
+zemond / post
+zemond / comment
+zemond / ui
