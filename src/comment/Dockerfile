@@ -1,22 +1,16 @@
-FROM alpine:3.7
+FROM ruby:2.2
 
-LABEL version="2.0"
-LABEL maintainer="s.kushnerchuk@frontol.ru"
+RUN printf "deb http://archive.debian.org/debian/ jessie main\ndeb-src http://archive.debian.org/debian/ jessie main\ndeb http://security.debian.org jessie/updates main\ndeb-src http://security.debian.org jessie/updates main" > /etc/apt/sources.list
+RUN apt-get update -qq && apt-get install -y build-essential
 
-ENV APP_DIR /app
-WORKDIR $APP_DIR
+ENV APP_HOME /app
+RUN mkdir $APP_HOME
+WORKDIR $APP_HOME
 
-COPY Gemfile* $APP_DIR/
+ADD Gemfile* $APP_HOME/
 
-RUN apk add --update --no-cache --virtual build_deps gcc make musl-dev ruby \
-        ruby-dev ruby-bundler ruby-rdoc ruby-irb \
-    && gem install bundler \
-    && bundle install --no-cache \
-    && bundle clean --force \
-    && apk del build_deps \
-    && apk add --no-cache ruby-rdoc
-
-COPY . $APP_DIR
+RUN bundle install
+ADD . $APP_HOME
 
 ENV COMMENT_DATABASE_HOST comment_db
 ENV COMMENT_DATABASE comments

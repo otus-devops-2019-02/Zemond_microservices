@@ -1,13 +1,17 @@
-FROM ruby:2.4.6-alpine
-RUN apk add --no-cache build-base
+FROM ubuntu:16.04
+
+#RUN printf "deb http://archive.debian.org/debian/ jessie main\ndeb-src http://archive.debian.org/debian/ jessie main\ndeb http://security.debian.org jessie/updates main\ndeb-src http://security.debian.org jessie/updates main" > /etc/apt/sources.list
+RUN apt-get update \
+    && apt-get install -y ruby-full ruby-dev build-essential \
+    && gem install bundler --no-ri --no-rdoc
 
 ENV APP_HOME /app
 RUN mkdir $APP_HOME
-WORKDIR $APP_HOME
 
-COPY Gemfile* $APP_HOME/
+WORKDIR $APP_HOME
+ADD Gemfile* $APP_HOME/
 RUN bundle install
-COPY . $APP_HOME
+ADD . $APP_HOME
 
 ENV POST_SERVICE_HOST post
 ENV POST_SERVICE_PORT 5000
