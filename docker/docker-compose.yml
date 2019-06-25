@@ -1,43 +1,30 @@
 version: '3.3'
 services:
-  mongo_db:
-    container_name: mongo_db
-    image: mongo:3.2
+  post_db:
+    image: mongo:${MONGO_V}
     volumes:
       - post_db:/data/db
     networks:
       back_net:
         aliases:
-         - post_db
-         - comment_db
-
+        - post_db
+        - comment_db
   ui:
-#    build: ./ui
-    image: ${USER_NAME}/ui:${UI_VERSION}
-    env_file: .env
+    image: ${USER_NAME}/ui:${UI_V}
     ports:
-      - 9292:9292/tcp
+      - ${PORT_NUM}:9292/tcp
     networks:
       - front_net
-
   post:
-    container_name: post
-#    build: ./post-py
-    image: ${USER_NAME}/post:${POST_VERSION}
-    env_file: .env
+    image: ${USER_NAME}/post:${POST_V}
     networks:
       - back_net
       - front_net
-
   comment:
-    container_name: comment
-#    build: ./comment
-    image: ${USER_NAME}/comment:${COMMENT_VERSION}
-    env_file: .env
+    image: ${USER_NAME}/comment:${COMMENT_V}
     networks:
       - back_net
       - front_net
-
   prometheus:
     image: ${USER_NAME}/prometheus
     ports:
@@ -68,30 +55,31 @@ services:
       - front_net
 
   mongodb-exporter:
-    image: xendera/mongodb-exporter
-    container_name: mongodb-exporter
-    ports:
-      - 9216:9216
-#    command: -mongodb.tls -mongodb.tls-ca /etc/certs/mycert.crt -mongodb.tls-private-key /etc/certs/mycert.pem
-#    volumes:
-#      - /etc/certs:/etc/certs
-    environment:
-      - MONGODB_URL=mongodb://mongo_db
+    image: ${USER_NAME}/mongodb-exporter:${VERSION}
+    command:
+      - '--mongodb.uri=mongodb://post_db:27017'
+      - '--collect.database'
+      - '--collect.collection'
+      - '--collect.topmetrics'
     networks:
       - back_net
+      - front_net
 
-volumes:
-  prometheus_data:
-  post_db:
+  blackbox-exporter:
+    image: tmp/blackbox-exporter:master
+    user: root 
+    ports:
+      - '9115:9115'
+    networks:
+      - back_net
+      - front_net
 
 networks:
   back_net:
-    ipam:
-      driver: default
-      config:
-        - subnet: 10.0.2.0/24
+    driver: bridge
   front_net:
-    ipam:
-      driver: default
-      config:
-        - subnet: 10.0.1.0/24
+    driver: bridge
+
+volumes:
+  post_db:
+  prometheus_data:
