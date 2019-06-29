@@ -145,3 +145,25 @@ zemond / prometheus
 zemond / post
 zemond / comment
 zemond / ui
+
+Домашняя работа №20
+
+Сделал основное задание
+Создал docker-host start_docker_machine.sh
+
+Через gcp настроил правила для firewall
+
+gcloud compute firewall-rules create grafana-default --allow tcp:3000
+gcloud compute firewall-rules create cadvisor-default --allow tcp:8080
+gcloud compute firewall-rules create cloudprober-default --allow tcp:9313
+gcloud compute firewall-rules create prometheus-alertmanager --allow tcp:9093
+gcloud compute firewall-rules create prometheus-default --allow tcp:9090
+
+Выполнил docker-compose up -d 
+Запустил мониторинг и алерты через docker-compose docker/docker-compose-monitoring.yml
+
+Настроил сбор метрик докера с помощью cAdvisor
+Настроил  Grafana и AlertManager
+Настроил дашборды для сбора метрик приложения и бизнес метрик
+Настроил алерты на остановку сервисов
+Настроил интеграцию с тестовым Slack-чатом 
