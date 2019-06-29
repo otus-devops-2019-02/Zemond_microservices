@@ -167,3 +167,18 @@ gcloud compute firewall-rules create prometheus-default --allow tcp:9090
 Настроил дашборды для сбора метрик приложения и бизнес метрик
 Настроил алерты на остановку сервисов
 Настроил интеграцию с тестовым Slack-чатом 
+
+Домашняя работа №21
+
+1. Скачал архивы
+	wget https://github.com/express42/reddit/archive/logging.zip && unzip -x logging.zip
+2. Сделал сборку
+	export USER_NAME=zemond && for i in ui post-py comment; do cd src/$i; bash docker_build.sh; cd -; done
+3. Настроил окружение 
+4. Создал отдельный docker-compose-logging.yml
+5. В отдельной директории создал докер файл для fluentd:v0.12 с файлом конфигурации fluent.conf
+6. Собрал образ
+	docker build -t $USER_NAME/fluentd .
+7. Поднял инфраструтуру 
+8. Посмотрел работу логов и парсинга
+9. Посмотрел на трейсинг через zipkin
