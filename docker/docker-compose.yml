@@ -2,21 +2,21 @@ version: '3.3'
 services:
   post_db:
     image: mongo:3.2
-    container_name: ${post_db_name}
     volumes:
-      - ${db_volume}:/data/db
+      - post_db:/data/db
     networks:
       back_net:
         aliases:
           - comment_db
-          - post_db
-
-
   ui:
+#    build: ./ui
     image: ${USER_NAME}/ui:${UI_VERSION}
-    container_name: ${ui_name}_${UI_VERSION}
+    environment:
+      - ZIPKIN_ENABLED=${ZIPKIN_ENABLED}
+    depends_on:
+      - post
     ports:
-      - ${EXP_PORT}:9292/tcp
+      - ${UI_PORT}:9292/tcp
     networks:
       - front_net
     logging:
@@ -24,33 +24,31 @@ services:
       options:
         fluentd-address: localhost:24224
         tag: service.ui
+  post:
+#    build: ./post-py
+    image: ${USER_NAME}/post:${POST_VERSION}
     environment:
       - ZIPKIN_ENABLED=${ZIPKIN_ENABLED}
-
-
-  post:
-    image: ${USER_NAME}/post:${POST_VERSION}
-    container_name: ${post_name}_${POST_VERSION}
     networks:
       - back_net
       - front_net
+    depends_on:
+      - post_db
+    ports:
+      - "5000:5000"
     logging:
       driver: "fluentd"
       options:
         fluentd-address: localhost:24224
         tag: service.post
+  comment:
+#    build: ./comment
+    image: ${USER_NAME}/comment:${COMMENT_VERSION}
     environment:
       - ZIPKIN_ENABLED=${ZIPKIN_ENABLED}
-
-  comment:
-    image: ${USER_NAME}/comment:${COMMENT_VERSION}
-    container_name: ${comment_name}_${COMMENT_VERSION}
     networks:
       - back_net
       - front_net
-    environment:
-      - ZIPKIN_ENABLED=${ZIPKIN_ENABLED}    
-
 
 volumes:
   post_db:
@@ -61,10 +59,10 @@ networks:
     ipam:
       driver: default
       config:
-      - subnet: 10.0.2.0/24
+        - subnet: 10.0.2.0/24
   front_net:
     driver: bridge
     ipam:
       driver: default
       config:
-      - subnet: 10.0.1.0/24
+        - subnet: 10.0.1.0/24
