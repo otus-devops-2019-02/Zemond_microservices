@@ -1,35 +1,14 @@
-FROM alpine:3.9 AS build
-RUN apk -U update \
-    && apk add --virtual build-dependencies \
-        build-base \
-    && apk add ruby-full ruby-dev \
-    && gem install bundler:1.17.2 --no-ri --no-rdoc
+FROM alpine:3.9.4
 
 ENV APP_HOME /app
 RUN mkdir $APP_HOME
-
 WORKDIR $APP_HOME
-ADD Gemfile* $APP_HOME/
-RUN bundle install
+COPY . $APP_HOME
 
-FROM alpine:3.9
-RUN apk -U update \
-    && apk add ruby-full
-
-ENV APP_HOME /app
-
-WORKDIR $APP_HOME
-
-COPY --from=build /usr/lib/ruby /usr/lib/ruby
-COPY --from=build /$APP_HOME /$APP_HOME
-COPY --from=build \ 
-/usr/bin/tilt \
-/usr/bin/rackup \
-/usr/bin/puma \
-/usr/bin/pumactl \
-/usr/bin/
-
-ADD . $APP_HOME
+RUN apk update && apk add --no-cache build-base ruby ruby-json ruby-bigdecimal ruby-dev ruby-bundler \
+	&& gem install bundler --no-ri --no-rdoc \
+	&& bundle install \
+	&& apk del build-base ruby-dev
 
 ENV COMMENT_DATABASE_HOST comment_db
 ENV COMMENT_DATABASE comments
