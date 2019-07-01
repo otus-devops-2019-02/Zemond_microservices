@@ -182,3 +182,14 @@ gcloud compute firewall-rules create prometheus-default --allow tcp:9090
 7. Поднял инфраструтуру 
 8. Посмотрел работу логов и парсинга
 9. Посмотрел на трейсинг через zipkin
+
+Домашняя работа №22
+
+1. Описал манифесты:
+
+	post-deployment.yml
+	ui-deployment.yml
+	comment-deployment.yml
+	mongo-deployment.yml
+
+2. Прошел Kubernetes The Hard Way. Файлы сложил в директорию the_hard_way.
