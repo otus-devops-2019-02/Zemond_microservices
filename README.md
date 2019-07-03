@@ -193,3 +193,38 @@ gcloud compute firewall-rules create prometheus-default --allow tcp:9090
 	mongo-deployment.yml
 
 2. Прошел Kubernetes The Hard Way. Файлы сложил в директорию the_hard_way.
+
+Домашняя работа №22
+
+1. Установил kubectl 
+	
+	sudo apt-get install kubectl
+
+2.Установил Minikube, запустил ui
+
+	kubectl apply -f ui-deployment.yml
+
+3. пробросим сетевые порты что бы открыть в браузере http://localhost:8080
+
+	kubectl get pods --selector component=ui
+	kubectl port-forward <pod-name> 8080:9292
+
+4. Выполнил:
+
+	kubectl apply -f comment-deployment.yml kubectl get pods --selector component=comment -
+	kubectl apply -f post-deployment.yml kubectl get pods --selector component=post kubectl get deployment
+	kubectl apply -f mongo-deployment.yml
+
+5. Создал объекты service для ui-service.yml, post-service.yml и comment-service.yml
+
+6. Создал кластер в гугл
+
+	gcloud container clusters get-credentials standard-cluster-1 --zone europe-west1-d --project docker-239201
+	kubectl config view 
+	kubectl apply -f reddit/dev-namespace.yml -n dev -f reddit/ 
+
+7. Настроил брендмауэр для портов tcp:30000-32767
+
+8. Для определения порта публикации сервиса ui
+
+	kubectl describe service ui -n dev | grep NodePort
