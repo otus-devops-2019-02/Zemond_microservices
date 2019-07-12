@@ -194,7 +194,7 @@ gcloud compute firewall-rules create prometheus-default --allow tcp:9090
 
 2. Прошел Kubernetes The Hard Way. Файлы сложил в директорию the_hard_way.
 
-Домашняя работа №22
+Домашняя работа №23
 
 1. Установил kubectl 
 	
@@ -228,3 +228,99 @@ gcloud compute firewall-rules create prometheus-default --allow tcp:9090
 8. Для определения порта публикации сервиса ui
 
 	kubectl describe service ui -n dev | grep NodePort
+
+Домашняя работа №24
+
+Проскейлим в 0 сервис, который следит, чтобы dns-kube подов всегда хватало 
+
+	kubectl scale deployment --replicas 0 -n kube-system kube-dnsautoscaler
+
+Проскейлим в 0 сам kube-dns 
+
+	kubectl scale deployment --replicas 0 -n kube-system kube-dns
+
+Вернем kube-dns-autoscale в исходную
+
+	kubectl scale deployment --replicas 1 -n kube-system kube-dnsautoscaler
+	kubectl apply -f ui-service.yml -n dev
+	kubectl get service  -n dev --selector component=ui
+	kubectl get service -n dev --selector component=ui
+
+Ingress
+
+Создадим новый конфиг ui-ingress.yml 
+
+	kubectl apply -f ui-ingress.yml -n dev
+	kubectl get ingress -n dev 
+
+Поправим ui-service.yml
+
+	kubectl apply -f ui-service.yml -n dev
+
+secret
+
+	kubectl get ingress -n dev
+
+Далее подготовим сертификат используя IP как CN
+
+	openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout tls.key -out tls.crt -subj "/CN=35.245.128.95" 
+
+И загрузим сертификат в кластер kubernetes
+	
+	kubectl create secret tls ui-ingress --key tls.key --cert tls.crt -n dev
+
+Проверим командой
+
+	kubectl describe secret ui-ingress -n dev
+
+Правим ui-ingress.yml 
+
+	kubectl apply -f ui-ingress.yml -n dev
+
+NetworkPolicy
+
+	gcloud beta container clusters list
+	gcloud beta container clusters update cluster-3 --zone=us-central1-a --update-addons=NetworkPolicy=ENABLED
+	gcloud beta container clusters update cluster-3 --zone=us-central1-a --enable-network-policy
+
+Создаем mongo-network-policy.yml
+
+	kubectl apply -f mongo-network-policy.yml -n dev
+
+Создадим mongo-deployment.yml
+
+Volume
+
+	gcloud compute disks create --size=25GB --zone=us-central1-a reddit-mongo-disk
+	kubectl apply -f mongo-deployment.yml -n dev
+	kubectl delete deploy mongo -n dev
+ 
+PersistentVolume
+
+	kubectl apply -f mongo-volume.yml -n dev
+
+создадим mongo-claim.yml
+
+	kubectl apply -f mongo-claim.yml -n dev
+	kubectl describe storageclass standard -n dev 
+
+Обновим mongo-deployment.yml
+
+	kubectl apply -f mongo-deployment.yml -n dev
+
+StorageClass
+
+создадим storage-fast.yml
+	
+	kubectl apply -f storage-fast.yml -n dev
+
+создадим mongo-claim-dynamic.yml
+
+	kubectl apply -f mongo-claim-dynamic.yml -n dev
+	kubectl apply -f mongo-deployment.yml -n dev
+
+kubectl get persistentvolume -n dev
+NAME                                       CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS      CLAIM                   STORAGECLASS   REASON   AGE
+pvc-m01885e8-9783-12e9-7cd2-43010a84020f   15Gi       RWO            Delete           Bound       dev/mongo-pvc           standard                12m40s
+pvc-a20sd404-9784-12e9-7cd2-43010a84020f   10Gi       RWO            Delete           Bound       dev/mongo-pvc-dynamic   fast                    56s
+reddit-mongo-disk                          25Gi       RWO            Retain           Available                                                   7m
