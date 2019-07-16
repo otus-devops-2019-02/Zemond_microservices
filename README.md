@@ -324,3 +324,45 @@ NAME                                       CAPACITY   ACCESS MODES   RECLAIM POL
 pvc-m01885e8-9783-12e9-7cd2-43010a84020f   15Gi       RWO            Delete           Bound       dev/mongo-pvc           standard                12m40s
 pvc-a20sd404-9784-12e9-7cd2-43010a84020f   10Gi       RWO            Delete           Bound       dev/mongo-pvc-dynamic   fast                    56s
 reddit-mongo-disk                          25Gi       RWO            Retain           Available                                                   7m
+
+Домашняя работа №25
+
+Helm
+Создал файл tiller.yml
+	
+	kubectl apply -f tiller.yml
+	helm init --service-account tiller
+	kubectl get pods -n kube-system --selector app=helm
+
+Сделал переконфигурацию
+
+	helm install --name test-ui-1 ui/
+
+Создал файл _helpers.tpl в папках templates сервисов ui, post и comment
+Вставил функцию “.fullname” в каждый _helpers.tpl файл.
+
+GitLab + Kubernetes
+
+	helm repo add gitlab https://charts.gitlab.io 
+	helm fetch gitlab/gitlab-omnibus --version 0.1.37 --untar
+	cd gitlab-omnibus
+	helm install --name gitlab . -f values.yaml
+
+В директории Gitlab_ci/ui:
+Инициализировал локальный git-репозиторий
+Добавил удаленный репозиторий
+Закоммитил и отправил в gitlab
+
+	git init
+	git remote add origin http://gitlab-gitlab/chromko/ui.git
+	git add .
+	git commit -m “init”
+	git push origin master
+
+Перенес содержимое директории Charts (папки ui, post, comment, reddit) в Gitlab_ci/reddit-deploy
+Запушил reddit-deploy в gitlab-проект reddit-deploy
+Скопировал полученный файл .gitlab-ci.yml для ui в репозитории для post и comment.
+Проверил, что динамическое создание и удаление окружений работает и с ними как ожидалось
+Файлы .gitlab-ci.yml, полученные в ходе работы, поместил в папку с исходниками для каждой компоненты приложения.
+Файл .gitlab-ci.yml для reddit-deploy поместил в charts.
+Все изменения, которые были внесены в Chart’ы - перенес в папку charts, созданную вначале.
