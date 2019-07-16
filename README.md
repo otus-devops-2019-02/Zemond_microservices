@@ -366,3 +366,51 @@ GitLab + Kubernetes
 Файлы .gitlab-ci.yml, полученные в ходе работы, поместил в папку с исходниками для каждой компоненты приложения.
 Файл .gitlab-ci.yml для reddit-deploy поместил в charts.
 Все изменения, которые были внесены в Chart’ы - перенес в папку charts, созданную вначале.
+
+Домашняя работа №26
+
+Из Helm-чарта установил ingress-контроллер nginx
+
+	helm install stable/nginx-ingress --name nginx
+
+По плану изучил следующие:
+
+-Развернул Prometheus в k8s
+-Настроил Prometheus и Grafana для сбора метрик
+-Настроил EFK для сбора логов
+
+Prometheus поставил с помощью Helm чарта. Загрузил prometheus локально в Charts каталог
+
+	cd kubernetes/charts && helm fetch —-untar stable/prometheus 
+
+Запустил Prometheus в k8s из charsts/prometheus
+
+	helm upgrade prom . -f custom_values.yml --install
+	helm upgrade prom . -f custom_values.yml --install
+ 
+Запустил приложение из helm чарта reddit
+
+	helm upgrade reddit-test ./reddit —install
+	helm upgrade production --namespace production ./reddit --install
+	helm upgrade staging --namespace staging ./reddit —install
+
+Поставил также grafana с помощью helm (ссылка на gist)
+
+	helm upgrade --install grafana stable/grafana --set "adminPassword=admin" \
+	--set "service.type=NodePort" \
+	--set "ingress.enabled=true" \
+	--set "ingress.hosts={reddit-grafana}"
+
+	kubectl label node gke-cluster-1-big-pool-b4209075-tvn3 elastichost=true
+ 
+Запустил стек в моем k8s
+
+	kubectl apply -f ./efk
+	
+Kibana поставил из helm чарта (ссылка на gist)
+	
+	helm upgrade --install kibana stable/kibana \
+	--set "ingress.enabled=true" \
+	--set "ingress.hosts={reddit-kibana}" \
+	--set "env.ELASTICSEARCH_URL=http://elasticsearch-logging:9200" \
+	--version 0.1.1
